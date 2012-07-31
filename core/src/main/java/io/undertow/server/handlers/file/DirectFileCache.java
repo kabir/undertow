@@ -26,8 +26,6 @@ import io.undertow.UndertowLogger;
 import io.undertow.UndertowMessages;
 import io.undertow.server.HttpCompletionHandler;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.server.handlers.HttpHandlers;
-import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.util.Headers;
 import org.xnio.ChannelListener;
 import org.xnio.FileAccess;
@@ -57,10 +55,9 @@ public class DirectFileCache implements FileCache {
             response.getWorker().submit(task);
         } catch (IOException e) {
             UndertowLogger.REQUEST_LOGGER.exceptionReadingFile(e, file);
-            HttpHandlers.executeHandler(ResponseCodeHandler.HANDLE_500, exchange, completionHandler);
+            exchange.setResponseCode(500);
+            completionHandler.handleComplete();
         }
-
-
     }
 
     private class FileWriteTask implements Runnable, ChannelListener<StreamSinkChannel> {
